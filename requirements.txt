@@ -1,0 +1,6 @@
+streamlit
+pandas
+pymongo
+dnspython
+certifi
+python-dotenv

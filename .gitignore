@@ -1,0 +1,5 @@
+.env
+student_new.env
+.streamlit/secrets.toml
+__pycache__/
+.venv/
