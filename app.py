@@ -25,16 +25,28 @@ st.write("Analyse student marks, attendance, and academic performance.")
 # -----------------------------
 @st.cache_resource
 def get_collection():
-    mongo_uri = os.getenv("MONGO_URI")
+    # First try Streamlit Cloud Secrets, then the local .env file
+    try:
+        mongo_uri = st.secrets.get("MONGO_URI")
+    except Exception:
+        mongo_uri = None
 
     if not mongo_uri:
-        raise ValueError("MONGO_URI is missing from the .env file.")
+        mongo_uri = os.getenv("MONGO_URI")
 
-    client = MongoClient(mongo_uri, serverSelectionTimeoutMS=10000)
+    if not mongo_uri:
+        raise ValueError(
+            "MONGO_URI is missing. Add it to Streamlit Secrets "
+            "or your local .env file."
+        )
+
+    client = MongoClient(
+        mongo_uri,
+        tlsCAFile=__import__("certifi").where(),
+        serverSelectionTimeoutMS=15000
+    )
     client.admin.command("ping")
 
-    # Uses the database and collection specified in the URI below.
-    # Change StudentsDB if your database has another name.
     db = client["Students"]
     return db["Students"]
 
